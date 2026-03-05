@@ -12,9 +12,39 @@ on:
 
 jobs:
   package:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-    uses: JakobMelchard/.github/.github/workflows/vscode.yml@main
-    with:
-      release: true
-      release_tag: ${{ github.event.inputs.release_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: package extension
+        run: vsce package --no-dependencies -o "${{ github.event.repository.name }}.vsix"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: ${{ github.event.repository.name }}.vsix
+
+      - name: create release
+        if: ${{ github.event.inputs.release_tag != '' || startsWith(github.ref, 'refs/tags/') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.event.inputs.release_tag || github.ref_name }}"
+          if ! gh release view "$TAG" 2>/dev/null; then
+            gh release create "$TAG" --title "$TAG" --generate-notes
+          fi
+
+      - name: attach to release
+        if: ${{ github.event.inputs.release_tag != '' || startsWith(github.ref, 'refs/tags/') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.event.inputs.release_tag || github.ref_name }} "${{ github.event.repository.name }}.vsix"
