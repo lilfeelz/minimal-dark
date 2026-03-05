@@ -4,6 +4,11 @@ on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'release tag name'
+        required: false
+        type: string
 
 jobs:
   package:
@@ -12,3 +17,4 @@ jobs:
     uses: JakobMelchard/.github/.github/workflows/vscode.yml@main
     with:
       release: true
+      release_tag: ${{ github.event.inputs.release_tag }}
