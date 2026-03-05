@@ -4,6 +4,7 @@
   "publisher": "lilfeelz",
   "description": "Minimal Dark theme for VS Code",
   "version": "1.0.0",
+  "repository": "https://github.com/lilfeelz/minimal-dark",
   "engines": { "vscode": "^1.60.0" },
   "categories": ["Themes"],
   "contributes": {
