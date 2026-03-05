@@ -1,0 +1,11 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  package:
+    uses: JakobMelchard/.github/.github/workflows/vscode.yml@main
+    with:
+      release: true
